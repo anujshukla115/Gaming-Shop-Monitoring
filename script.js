@@ -641,6 +641,9 @@ async function startDeviceSession(id) {
     }
 }
 
+// Store pending bill data for summary modal
+let pendingBillData = null;
+
 async function endDeviceSession(id) {
     const device = devices.find(d => d._id === id);
     if (!device || !device.isActive) {
@@ -653,19 +656,115 @@ async function endDeviceSession(id) {
     const durationMs = endTime - startTime;
     const durationHours = durationMs / (1000 * 60 * 60);
     
+    // Calculate bill (minimum 30 minutes)
     const minHours = Math.max(durationHours, 0.5);
     const amount = Math.round((minHours * device.ratePerHour) * 100) / 100;
     
+    // Store bill data for summary
+    pendingBillData = {
+        deviceId: device._id,
+        deviceName: device.name,
+        deviceType: device.type,
+        startTime: device.sessionStart,
+        endTime: endTime.toISOString(),
+        duration: durationMs,
+        durationHours: minHours,
+        amount: amount,
+        ratePerHour: device.ratePerHour
+    };
+    
+    // Stop the timer
+    stopTimer(id);
+    
+    // Show bill summary modal
+    showBillSummary(pendingBillData);
+}
+
+function showBillSummary(data) {
+    // Set device icon
+    const icon = DEVICE_ICONS[data.deviceType] || 'fa-gamepad';
+    document.getElementById('summaryDeviceIcon').className = `fas ${icon}`;
+    
+    // Set device name and type
+    document.getElementById('summaryDeviceName').textContent = data.deviceName;
+    document.getElementById('summaryDeviceType').textContent = 
+        data.deviceType.charAt(0).toUpperCase() + data.deviceType.slice(1);
+    
+    // Set times
+    document.getElementById('summaryStartTime').textContent = formatDate(data.startTime);
+    document.getElementById('summaryEndTime').textContent = formatDate(data.endTime);
+    
+    // Set duration
+    const hours = Math.floor(data.durationHours);
+    const minutes = Math.round((data.durationHours - hours) * 60);
+    document.getElementById('summaryDuration').textContent = `${hours}h ${minutes}m`;
+    
+    // Set amount
+    document.getElementById('summaryAmount').textContent = 
+        `${CURRENCY_SYMBOLS[userCurrency]}${formatCurrency(data.amount)}`;
+    
+    // Show modal
+    document.getElementById('billSummaryModal').classList.remove('hidden');
+}
+
+function closeBillSummary() {
+    document.getElementById('billSummaryModal').classList.add('hidden');
+    pendingBillData = null;
+}
+
+async function confirmBillPaid() {
+    if (!pendingBillData) return;
+    
     try {
         const billData = {
-            deviceId: device._id,
-            deviceName: device.name,
-            deviceType: device.type,
-            startTime: device.sessionStart,
-            endTime: endTime.toISOString(),
-            duration: durationMs,
-            durationHours: minHours,
-            amount: amount,
+            deviceId: pendingBillData.deviceId,
+            deviceName: pendingBillData.deviceName,
+            deviceType: pendingBillData.deviceType,
+            startTime: pendingBillData.startTime,
+            endTime: pendingBillData.endTime,
+            duration: pendingBillData.duration,
+            durationHours: pendingBillData.durationHours,
+            amount: pendingBillData.amount,
+            status: 'paid'
+        };
+        
+        const result = await saveBill(billData);
+        
+        if (result.success) {
+            bills.push(result.bill);
+            
+            // Update device
+            const device = devices.find(d => d._id === pendingBillData.deviceId);
+            if (device) {
+                device.isActive = false;
+                device.sessionStart = null;
+                device.totalEarning += pendingBillData.amount;
+                device.totalTime += pendingBillData.duration;
+                await saveDevice(device);
+            }
+            
+            closeBillSummary();
+            showNotification(`Bill paid! ${CURRENCY_SYMBOLS[userCurrency]}${formatCurrency(pendingBillData.amount)}`, 'success');
+            updateAllDisplays();
+        }
+    } catch (error) {
+        showNotification('Failed to save bill: ' + error.message, 'error');
+    }
+}
+
+async function confirmBillPending() {
+    if (!pendingBillData) return;
+    
+    try {
+        const billData = {
+            deviceId: pendingBillData.deviceId,
+            deviceName: pendingBillData.deviceName,
+            deviceType: pendingBillData.deviceType,
+            startTime: pendingBillData.startTime,
+            endTime: pendingBillData.endTime,
+            duration: pendingBillData.duration,
+            durationHours: pendingBillData.durationHours,
+            amount: pendingBillData.amount,
             status: 'pending'
         };
         
@@ -674,19 +773,22 @@ async function endDeviceSession(id) {
         if (result.success) {
             bills.push(result.bill);
             
-            device.isActive = false;
-            device.sessionStart = null;
-            device.totalEarning += amount;
-            device.totalTime += durationMs;
+            // Update device
+            const device = devices.find(d => d._id === pendingBillData.deviceId);
+            if (device) {
+                device.isActive = false;
+                device.sessionStart = null;
+                device.totalEarning += pendingBillData.amount;
+                device.totalTime += pendingBillData.duration;
+                await saveDevice(device);
+            }
             
-            await saveDevice(device);
-            
-            stopTimer(id);
-            showNotification(`Session ended! Bill: ${CURRENCY_SYMBOLS[userCurrency]}${formatCurrency(amount)}`, 'success');
+            closeBillSummary();
+            showNotification(`Bill added to pending! ${CURRENCY_SYMBOLS[userCurrency]}${formatCurrency(pendingBillData.amount)}`, 'warning');
             updateAllDisplays();
         }
     } catch (error) {
-        showNotification('Failed to end session: ' + error.message, 'error');
+        showNotification('Failed to save bill: ' + error.message, 'error');
     }
 }
 
