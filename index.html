@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinFlow | Expense Tracker</title>
+  <title>GameHub | Gaming Shop Manager</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
 <body>
@@ -18,20 +18,22 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="logo">
-        <i class="fas fa-chart-line"></i>
-        <span class="logo-text">FinFlow</span>
+        <div class="logo-icon">
+          <i class="fas fa-gamepad"></i>
+        </div>
+        <span class="logo-text">GameHub</span>
       </div>
     </div>
     
     <div class="sidebar-nav">
       <button class="nav-btn active" onclick="showSection('dashboard')">
-        <i class="fas fa-home"></i>
-        <span class="nav-text">Dashboard</span>
+        <i class="fas fa-store"></i>
+        <span class="nav-text">Shop Dashboard</span>
       </button>
       
-      <button class="nav-btn" onclick="showSection('expenses')">
-        <i class="fas fa-wallet"></i>
-        <span class="nav-text">Expenses</span>
+      <button class="nav-btn" onclick="showSection('devices')">
+        <i class="fas fa-desktop"></i>
+        <span class="nav-text">Devices</span>
       </button>
       
       <button class="nav-btn" onclick="showSection('analytics')">
@@ -39,19 +41,14 @@
         <span class="nav-text">Analytics</span>
       </button>
       
-      <button class="nav-btn" onclick="showSection('recurring')">
-        <i class="fas fa-redo"></i>
-        <span class="nav-text">Recurring</span>
+      <button class="nav-btn" onclick="showSection('expenses')">
+        <i class="fas fa-wallet"></i>
+        <span class="nav-text">Shop Expenses</span>
       </button>
       
       <button class="nav-btn" onclick="showSection('bills')">
-        <i class="fas fa-bell"></i>
-        <span class="nav-text">Bill Reminders</span>
-      </button>
-      
-      <button class="nav-btn" onclick="showSection('split')">
-        <i class="fas fa-users"></i>
-        <span class="nav-text">Split Expenses</span>
+        <i class="fas fa-receipt"></i>
+        <span class="nav-text">Bills</span>
       </button>
     </div>
     
@@ -66,13 +63,11 @@
         <span class="nav-text">Profile</span>
       </button>
       
-      <!-- ADDED: Switch Account Button -->
       <button class="switch-account-btn" onclick="switchAccount()">
         <i class="fas fa-exchange-alt"></i>
         <span class="nav-text">Switch Account</span>
       </button>
       
-      <!-- ADDED: Logout Button -->
       <button class="logout-btn" onclick="logout()">
         <i class="fas fa-sign-out-alt"></i>
         <span class="nav-text">Logout</span>
@@ -85,8 +80,8 @@
     <!-- Header -->
     <header class="main-header">
       <div class="header-left">
-        <h1 id="username" class="animate__animated animate__fadeIn">Welcome to FinFlow</h1>
-        <p class="subtitle">Track your expenses, achieve your financial goals</p>
+        <h1 id="username" class="animate__animated animate__fadeIn">Welcome to GameHub</h1>
+        <p class="subtitle">Manage your gaming shop, track sessions, and handle bills</p>
       </div>
       <div class="header-right">
         <div class="currency-selector">
@@ -107,256 +102,321 @@
     <!-- ===== DASHBOARD SECTION ===== -->
     <section id="dashboard" class="section">
       <div class="stats-grid">
-        <div class="stat-card income animate__animated animate__fadeInUp">
+        <div class="stat-card active-sessions animate__animated animate__fadeInUp">
           <div class="stat-icon">
-            <i class="fas fa-money-bill-wave"></i>
+            <i class="fas fa-gamepad"></i>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Monthly Income</p>
-            <h3 class="stat-value"><span id="currencySymbol">₹</span><span id="totalIncome">0</span></h3>
+            <p class="stat-label">Active Sessions</p>
+            <h3 class="stat-value" id="activeSessions">0</h3>
           </div>
         </div>
         
-        <div class="stat-card expense animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+        <div class="stat-card today-earning animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
           <div class="stat-icon">
-            <i class="fas fa-shopping-cart"></i>
+            <i class="fas fa-coins"></i>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Total Expenses</p>
-            <h3 class="stat-value"><span id="currencySymbol">₹</span><span id="totalExpense">0</span></h3>
+            <p class="stat-label">Today's Earning</p>
+            <h3 class="stat-value"><span id="currencySymbol">₹</span><span id="todayEarning">0</span></h3>
           </div>
         </div>
         
-        <div class="stat-card balance animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+        <div class="stat-card total-devices animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
           <div class="stat-icon">
-            <i class="fas fa-piggy-bank"></i>
+            <i class="fas fa-desktop"></i>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Balance</p>
-            <h3 class="stat-value"><span id="currencySymbol">₹</span><span id="balance">0</span></h3>
+            <p class="stat-label">Total Devices</p>
+            <h3 class="stat-value" id="totalDevices">0</h3>
           </div>
         </div>
         
-        <div class="stat-card savings animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
+        <div class="stat-card pending-bills animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
           <div class="stat-icon">
-            <i class="fas fa-chart-line"></i>
+            <i class="fas fa-clock"></i>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Savings Rate</p>
-            <h3 class="stat-value" id="savingsRate">0%</h3>
+            <p class="stat-label">Pending Bills</p>
+            <h3 class="stat-value" id="pendingBills">0</h3>
           </div>
         </div>
       </div>
 
-      <div class="chart-container">
-        <!-- First Chart: Monthly Income vs Expenses -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>Monthly Income vs Expenses</h3>
-            <div class="chart-actions">
-              <button class="btn-icon" onclick="downloadChart('trendChart')" title="Download">
-                <i class="fas fa-download"></i>
-              </button>
-            </div>
-          </div>
-          <div class="chart-wrapper">
-            <canvas id="trendChart"></canvas>
-          </div>
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="quick-stat-card">
+          <span class="quick-label">Today's Sessions</span>
+          <span class="quick-value" id="todaySessions">0</span>
         </div>
-        
-        <!-- DONUT CHART: Income vs Expenses vs Savings -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>Income vs Expenses vs Savings</h3>
-            <div class="chart-actions">
-              <button class="btn-icon" onclick="downloadChart('incomeExpenseChart')" title="Download">
-                <i class="fas fa-download"></i>
-              </button>
-            </div>
-          </div>
-          <div class="chart-wrapper">
-            <canvas id="incomeExpenseChart"></canvas>
-          </div>
+        <div class="quick-stat-card">
+          <span class="quick-label">This Week Earning</span>
+          <span class="quick-value"><span id="currencySymbol">₹</span><span id="weekEarning">0</span></span>
+        </div>
+        <div class="quick-stat-card">
+          <span class="quick-label">This Month Earning</span>
+          <span class="quick-value"><span id="currencySymbol">₹</span><span id="monthEarning">0</span></span>
+        </div>
+        <div class="quick-stat-card">
+          <span class="quick-label">Paid Bills</span>
+          <span class="quick-value" id="paidBillCount">0</span>
         </div>
       </div>
 
-      <div class="recent-expenses">
+      <!-- Recent Activity -->
+      <div class="recent-activity">
         <div class="section-header">
-          <h3>Recent Expenses</h3>
-          <button class="btn-text" onclick="showSection('expenses')">
+          <h3>Recent Sessions</h3>
+          <button class="btn-text" onclick="showSection('devices')">
             View All <i class="fas fa-arrow-right"></i>
           </button>
         </div>
-        <div id="recentExpenseList" class="expense-table">
+        <div id="recentSessions" class="activity-list">
           <div class="empty-state">
-            <i class="fas fa-receipt"></i>
-            <p>No expenses yet</p>
-            <p class="text-muted">Add your first expense to get started</p>
+            <i class="fas fa-gamepad"></i>
+            <p>No active sessions</p>
+            <p class="text-muted">Start a gaming session to track time and earnings</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== EXPENSE SECTION ===== -->
-    <section id="expenses" class="section hidden">
+    <!-- ===== DEVICES SECTION ===== -->
+    <section id="devices" class="section hidden">
       <div class="section-header">
         <div class="header-left">
-          <h2>Expense Management</h2>
+          <h2><i class="fas fa-desktop"></i> Gaming Devices</h2>
         </div>
         <div class="header-right">
-          <div class="total-display">
-            Total: <strong id="expenseTotal">₹0</strong>
-          </div>
-          <button class="btn-secondary" onclick="manageCategories()">
-            <i class="fas fa-tags"></i> Manage Categories
+          <button class="btn-primary" onclick="showAddDeviceModal()">
+            <i class="fas fa-plus-circle"></i> Add Device
           </button>
         </div>
       </div>
 
-      <div class="add-expense-card">
-        <h3>Add New Expense</h3>
-        <div class="expense-form-grid">
-          <div class="form-group">
-            <label for="title"><i class="fas fa-pen"></i> Title</label>
-            <input id="title" placeholder="What did you spend on?" />
-          </div>
-          
-          <div class="form-group">
-            <label for="amount"><i class="fas fa-rupee-sign"></i> Amount</label>
-            <input id="amount" type="number" placeholder="0.00" />
-          </div>
-          
-          <div class="form-group">
-            <label for="category"><i class="fas fa-tag"></i> Category</label>
-            <select id="category">
-              <option value="">Select Category</option>
-              <!-- Categories will be populated by JavaScript -->
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="date"><i class="fas fa-calendar"></i> Date</label>
-            <input id="expenseDate" type="date" />
-          </div>
-          
-          <button class="btn-primary btn-add" onclick="addExpense()">
-            <i class="fas fa-plus-circle"></i> Add Expense
-          </button>
-        </div>
-      </div>
-
-      <div class="expense-list-card">
-        <div class="list-header">
-          <h3>All Expenses</h3>
-        </div>
-        <div id="expenseList" class="expense-table">
-          <!-- Expenses will load here -->
-        </div>
+      <div class="devices-grid" id="devicesGrid">
+        <!-- Devices will be loaded here -->
       </div>
     </section>
 
     <!-- ===== ANALYTICS SECTION ===== -->
     <section id="analytics" class="section hidden">
       <div class="section-header">
-        <h2>Financial Analytics</h2>
+        <h2><i class="fas fa-chart-pie"></i> Gaming Analytics</h2>
       </div>
 
       <div class="analytics-grid">
-        <!-- Large Spending Trends chart - now takes full width -->
+        <!-- Daily Earning Chart -->
         <div class="analytics-card full-width">
           <div class="chart-header">
-            <h3>Spending Trends</h3>
+            <h3>Last 7 Days Earning</h3>
             <div class="chart-actions">
-              <button class="btn-icon" onclick="downloadChart('monthlyTrendChart')" title="Download">
+              <button class="btn-icon" onclick="downloadChart('dailyEarningChart')" title="Download">
                 <i class="fas fa-download"></i>
               </button>
             </div>
           </div>
           <div class="chart-wrapper">
-            <canvas id="monthlyTrendChart"></canvas>
+            <canvas id="dailyEarningChart"></canvas>
           </div>
         </div>
         
-        <!-- Two smaller charts side by side -->
-        <div class="analytics-card half-width">
+        <!-- Monthly Earning Chart -->
+        <div class="analytics-card full-width">
           <div class="chart-header">
-            <h3>Expense Distribution by Category</h3>
+            <h3>Monthly Earning Trend</h3>
             <div class="chart-actions">
-              <button class="btn-icon" onclick="downloadChart('categoryChart')" title="Download">
+              <button class="btn-icon" onclick="downloadChart('monthlyEarningChart')" title="Download">
                 <i class="fas fa-download"></i>
               </button>
             </div>
           </div>
           <div class="chart-wrapper">
-            <canvas id="categoryChart"></canvas>
+            <canvas id="monthlyEarningChart"></canvas>
           </div>
         </div>
         
+        <!-- Paid vs Pending Pie Chart -->
         <div class="analytics-card half-width">
           <div class="chart-header">
-            <h3>Top Spending Categories</h3>
+            <h3>Paid vs Pending Bills</h3>
             <div class="chart-actions">
-              <button class="btn-icon" onclick="downloadChart('detailedCategoryChart')" title="Download">
+              <button class="btn-icon" onclick="downloadChart('billStatusChart')" title="Download">
                 <i class="fas fa-download"></i>
               </button>
             </div>
           </div>
           <div class="chart-wrapper">
-            <canvas id="detailedCategoryChart"></canvas>
+            <canvas id="billStatusChart"></canvas>
+          </div>
+        </div>
+        
+        <!-- Device Usage Chart -->
+        <div class="analytics-card half-width">
+          <div class="chart-header">
+            <h3>Device Usage</h3>
+            <div class="chart-actions">
+              <button class="btn-icon" onclick="downloadChart('deviceUsageChart')" title="Download">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="deviceUsageChart"></canvas>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ===== RECURRING EXPENSES SECTION ===== -->
-    <section id="recurring" class="section hidden">
+    <!-- ===== SHOP EXPENSES SECTION ===== -->
+    <section id="expenses" class="section hidden">
       <div class="section-header">
-        <h2>Recurring Expenses</h2>
-        <button class="btn-primary" onclick="showAddRecurringModal()">
-          <i class="fas fa-plus-circle"></i> Add Recurring Expense
-        </button>
+        <div class="header-left">
+          <h2><i class="fas fa-wallet"></i> Shop Expenses</h2>
+        </div>
+        <div class="header-right">
+          <div class="total-display">
+            Total Expenses: <strong id="expenseTotal">₹0</strong>
+          </div>
+          <button class="btn-primary" onclick="showAddExpenseModal()">
+            <i class="fas fa-plus-circle"></i> Add Expense
+          </button>
+        </div>
       </div>
 
-      <div class="recurring-grid" id="recurringGrid">
-        <!-- Recurring expenses will load here -->
+      <div class="expense-list-card">
+        <div id="expenseList" class="expense-table">
+          <!-- Expenses will load here -->
+        </div>
       </div>
     </section>
 
-    <!-- ===== BILL REMINDERS SECTION ===== -->
+    <!-- ===== BILLS SECTION ===== -->
     <section id="bills" class="section hidden">
       <div class="section-header">
-        <h2>Bill Reminders</h2>
-        <button class="btn-primary" onclick="showAddBillModal()">
-          <i class="fas fa-plus-circle"></i> Add Bill Reminder
-        </button>
+        <h2><i class="fas fa-receipt"></i> Bill Management</h2>
       </div>
 
-      <div class="reminders-container" id="remindersContainer">
-        <!-- Bill reminders will load here -->
-      </div>
-
-      <div class="calendar-section">
-        <h3>Bill Calendar</h3>
-        <div class="calendar" id="billCalendar">
-          <!-- Calendar will be populated by JavaScript -->
+      <div class="bills-container">
+        <!-- Pending Bills -->
+        <div class="bill-column">
+          <div class="bill-column-header pending">
+            <h3><i class="fas fa-clock"></i> Pending Bills</h3>
+            <span class="bill-count" id="pendingCount">0</span>
+          </div>
+          <div id="pendingBillsList" class="bill-list">
+            <!-- Pending bills will load here -->
+          </div>
         </div>
-      </div>
-    </section>
 
-    <!-- ===== SPLIT EXPENSES SECTION ===== -->
-    <section id="split" class="section hidden">
-      <div class="section-header">
-        <h2>Split Expenses</h2>
-        <button class="btn-primary" onclick="showSplitExpenseModal()">
-          <i class="fas fa-plus-circle"></i> Split New Expense
-        </button>
-      </div>
-
-      <div class="split-container" id="splitContainer">
-        <!-- Split expenses will load here -->
+        <!-- Paid Bills -->
+        <div class="bill-column">
+          <div class="bill-column-header paid">
+            <h3><i class="fas fa-check-circle"></i> Paid Bills</h3>
+            <span class="bill-count" id="paidCount">0</span>
+          </div>
+          <div id="paidBillsList" class="bill-list">
+            <!-- Paid bills will load here -->
+          </div>
+        </div>
       </div>
     </section>
   </main>
+
+  <!-- ================= ADD DEVICE MODAL ================= -->
+  <div id="addDeviceModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-plus-circle"></i> Add New Device</h3>
+        <button class="modal-close" onclick="closeAddDeviceModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="device-form">
+          <div class="form-group">
+            <label for="deviceName"><i class="fas fa-tag"></i> Device Name</label>
+            <input id="deviceName" placeholder="e.g., Monitor 1, PS 5, Gaming PC" />
+          </div>
+          
+          <div class="form-group">
+            <label for="deviceType"><i class="fas fa-category"></i> Device Type</label>
+            <select id="deviceType">
+              <option value="monitor">Monitor</option>
+              <option value="ps">PlayStation</option>
+              <option value="xbox">Xbox</option>
+              <option value="pc">Gaming PC</option>
+              <option value="vr">VR Headset</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="deviceRate"><i class="fas fa-money-bill-wave"></i> Rate (per hour)</label>
+            <input id="deviceRate" type="number" placeholder="e.g., 100" />
+            <small class="form-hint">Rate in your selected currency</small>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeAddDeviceModal()">Cancel</button>
+            <button class="btn-primary" onclick="addDevice()">
+              <i class="fas fa-save"></i> Add Device
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADD EXPENSE MODAL ================= -->
+  <div id="addExpenseModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-plus-circle"></i> Add Shop Expense</h3>
+        <button class="modal-close" onclick="closeAddExpenseModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="expense-form">
+          <div class="form-group">
+            <label for="expenseTitle"><i class="fas fa-pen"></i> Title</label>
+            <input id="expenseTitle" placeholder="e.g., Electricity Bill, Rent" />
+          </div>
+          
+          <div class="form-group">
+            <label for="expenseAmount"><i class="fas fa-money-bill-wave"></i> Amount</label>
+            <input id="expenseAmount" type="number" placeholder="0.00" />
+          </div>
+          
+          <div class="form-group">
+            <label for="expenseCategory"><i class="fas fa-tag"></i> Category</label>
+            <select id="expenseCategory">
+              <option value="Electricity">Electricity</option>
+              <option value="Rent">Rent</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Internet">Internet</option>
+              <option value="Games">Games</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="expenseDate"><i class="fas fa-calendar"></i> Date</label>
+            <input id="expenseDate" type="date" />
+          </div>
+          
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeAddExpenseModal()">Cancel</button>
+            <button class="btn-primary" onclick="addShopExpense()">
+              <i class="fas fa-save"></i> Add Expense
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= PROFILE MODAL ================= -->
   <div id="profileModal" class="modal hidden">
@@ -383,7 +443,7 @@
           </div>
           
           <div class="form-group">
-            <label for="profileIncome"><i class="fas fa-money-bill-wave"></i> Monthly Income</label>
+            <label for="profileIncome"><i class="fas fa-money-bill-wave"></i> Shop Monthly Income</label>
             <input id="profileIncome" type="number" placeholder="Enter monthly income" />
           </div>
           
@@ -414,286 +474,6 @@
             <button class="btn-primary" onclick="saveProfile()">
               <i class="fas fa-save"></i> Save Changes
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD RECURRING EXPENSE MODAL -->
-  <div id="addRecurringModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-redo"></i> Add Recurring Expense</h3>
-        <button class="modal-close" onclick="closeAddRecurringModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="recurring-form">
-          <div class="form-group">
-            <label for="recurringTitle"><i class="fas fa-pen"></i> Title</label>
-            <input id="recurringTitle" placeholder="e.g., Netflix Subscription" />
-          </div>
-          
-          <div class="form-group">
-            <label for="recurringAmount"><i class="fas fa-rupee-sign"></i> Amount</label>
-            <input id="recurringAmount" type="number" placeholder="0.00" />
-          </div>
-          
-          <div class="form-group">
-            <label for="recurringCategory"><i class="fas fa-tag"></i> Category</label>
-            <select id="recurringCategory">
-              <option value="">Select Category</option>
-              <!-- Categories will be populated by JavaScript -->
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="recurringFrequency"><i class="fas fa-redo"></i> Frequency</label>
-            <select id="recurringFrequency">
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly" selected>Monthly</option>
-              <option value="quarterly">Quarterly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="recurringStartDate"><i class="fas fa-calendar"></i> Start Date</label>
-            <input id="recurringStartDate" type="date" />
-          </div>
-          
-          <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeAddRecurringModal()">Cancel</button>
-            <button class="btn-primary" onclick="saveRecurringExpense()">
-              <i class="fas fa-save"></i> Save Recurring Expense
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD BILL REMINDER MODAL -->
-  <div id="addBillModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-bell"></i> Add Bill Reminder</h3>
-        <button class="modal-close" onclick="closeAddBillModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="bill-form">
-          <div class="form-group">
-            <label for="billTitle"><i class="fas fa-pen"></i> Bill Name</label>
-            <input id="billTitle" placeholder="e.g., Electricity Bill" />
-          </div>
-          
-          <div class="form-group">
-            <label for="billAmount"><i class="fas fa-rupee-sign"></i> Amount</label>
-            <input id="billAmount" type="number" placeholder="0.00" />
-          </div>
-          
-          <div class="form-group">
-            <label for="billDueDate"><i class="fas fa-calendar"></i> Due Date</label>
-            <input id="billDueDate" type="date" />
-          </div>
-          
-          <div class="form-group">
-            <label for="billCategory"><i class="fas fa-tag"></i> Category</label>
-            <select id="billCategory">
-              <option value="">Select Category</option>
-              <!-- Categories will be populated by JavaScript -->
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="billReminderDays"><i class="fas fa-bell"></i> Remind Before</label>
-            <select id="billReminderDays">
-              <option value="1">1 day before</option>
-              <option value="3" selected>3 days before</option>
-              <option value="7">1 week before</option>
-              <option value="0">On due date</option>
-            </select>
-          </div>
-          
-          <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeAddBillModal()">Cancel</button>
-            <button class="btn-primary" onclick="saveBillReminder()">
-              <i class="fas fa-save"></i> Save Bill Reminder
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SPLIT EXPENSE MODAL -->
-  <div id="splitExpenseModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-users"></i> Split Expense</h3>
-        <button class="modal-close" onclick="closeSplitExpenseModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="split-form">
-          <div class="form-group">
-            <label for="splitTitle"><i class="fas fa-pen"></i> Expense Title</label>
-            <input id="splitTitle" placeholder="e.g., Dinner with friends" />
-          </div>
-          
-          <div class="form-group">
-            <label for="splitTotalAmount"><i class="fas fa-rupee-sign"></i> Total Amount</label>
-            <input id="splitTotalAmount" type="number" placeholder="0.00" />
-          </div>
-          
-          <div class="form-group">
-            <label for="splitCategory"><i class="fas fa-tag"></i> Category</label>
-            <select id="splitCategory">
-              <option value="">Select Category</option>
-              <!-- Categories will be populated by JavaScript -->
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="splitMethod"><i class="fas fa-divide"></i> Split Method</label>
-            <select id="splitMethod" onchange="changeSplitMethod()">
-              <option value="equal">Equal Split</option>
-              <option value="percentage">By Percentage</option>
-              <option value="exact">Exact Amounts</option>
-              <option value="shares">By Shares</option>
-            </select>
-          </div>
-          
-          <div class="split-members-section">
-            <h4>Split Among</h4>
-            <div class="split-inputs">
-              <div class="form-group">
-                <label for="numPeople"><i class="fas fa-users"></i> Number of People</label>
-                <input id="numPeople" type="number" min="1" value="1" oninput="updateSplitCalculation()" />
-              </div>
-              <div class="form-group">
-                <label for="splitMethod"><i class="fas fa-divide"></i> Split Method</label>
-                <select id="splitMethod" oninput="updateSplitCalculation()">
-                  <option value="equal">Equal Split</option>
-                  <option value="percentage">By Percentage</option>
-                  <option value="custom">Custom Amounts</option>
-                </select>
-              </div>
-            </div>
-            
-            <div id="splitMembersContainer">
-              <!-- Members will be generated here -->
-            </div>
-            
-            <div class="split-summary" id="splitSummary">
-              <!-- Summary will be populated by JavaScript -->
-            </div>
-          </div>
-          
-          <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeSplitExpenseModal()">Cancel</button>
-            <button class="btn-primary" onclick="saveSplitExpense()">
-              <i class="fas fa-save"></i> Save Split Expense
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADD CATEGORY MODAL -->
-  <div id="addCategoryModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
-        <button class="modal-close" onclick="closeAddCategoryModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="category-form">
-          <div class="form-group">
-            <label for="newCategoryName"><i class="fas fa-tag"></i> Category Name</label>
-            <input id="newCategoryName" placeholder="e.g., Groceries, Travel, etc." />
-          </div>
-          
-          <div class="form-group">
-            <label for="newCategoryIcon"><i class="fas fa-icons"></i> Icon</label>
-            <select id="newCategoryIcon">
-              <option value="📝">📝 Default</option>
-              <option value="🛒">🛒 Groceries</option>
-              <option value="✈️">✈️ Travel</option>
-              <option value="🏠">🏠 Rent</option>
-              <option value="💰">💰 Salary</option>
-              <option value="🍽️">🍽️ Dining</option>
-              <option value="🏋️">🏋️ Fitness</option>
-              <option value="🎁">🎁 Gifts</option>
-              <option value="💼">💼 Business</option>
-              <option value="🐾">🐾 Pets</option>
-              <option value="🎨">🎨 Hobbies</option>
-              <option value="🚗">🚗 Car</option>
-              <option value="📱">📱 Electronics</option>
-              <option value="👕">👕 Clothing</option>
-              <option value="💊">💊 Medicine</option>
-              <option value="🎓">🎓 Courses</option>
-              <option value="🎪">🎪 Events</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label for="newCategoryColor"><i class="fas fa-palette"></i> Color</label>
-            <input type="color" id="newCategoryColor" value="#FF6B6B">
-          </div>
-          
-          <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeAddCategoryModal()">Cancel</button>
-            <button class="btn-primary" onclick="saveNewCategory()">
-              <i class="fas fa-save"></i> Save Category
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MANAGE CATEGORIES MODAL -->
-  <div id="manageCategoriesModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3><i class="fas fa-tags"></i> Manage Categories</h3>
-        <button class="modal-close" onclick="closeManageCategoriesModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="categories-management">
-          <div class="categories-section">
-            <h4><i class="fas fa-star"></i> Default Categories</h4>
-            <div id="defaultCategoriesList" class="categories-list">
-              <!-- Default categories will be populated here -->
-            </div>
-          </div>
-          
-          <div class="categories-section">
-            <div class="section-header">
-              <h4><i class="fas fa-user-edit"></i> Your Custom Categories</h4>
-              <button class="btn-text" onclick="showAddCategoryModal()">
-                <i class="fas fa-plus"></i> Add New
-              </button>
-            </div>
-            <div id="customCategoriesList" class="categories-list">
-              <!-- Custom categories will be populated here -->
-            </div>
-          </div>
-          
-          <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeManageCategoriesModal()">Close</button>
           </div>
         </div>
       </div>
