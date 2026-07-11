@@ -16,6 +16,11 @@ let currentSessionTimers = {};
 // Editing states
 let editingDeviceId = null;
 
+// Store pending bill data for summary modal
+let pendingBillData = null;
+let isBillProcessing = false;
+let currentDeviceId = null;
+
 // Currency symbols
 const CURRENCY_SYMBOLS = {
     'INR': '₹',
@@ -76,12 +81,10 @@ async function apiRequest(endpoint, options = {}) {
     };
 
     try {
-        console.log(`API Request: ${endpoint}`, config);
         const response = await fetch(`${API_URL}${endpoint}`, config);
         const data = await response.json();
 
         if (!response.ok) {
-            console.error('API Error Response:', data);
             throw new Error(data.message || `API request failed with status ${response.status}`);
         }
 
@@ -161,14 +164,12 @@ async function loadShopExpenses() {
 async function saveDevice(device) {
     try {
         if (device._id) {
-            // Update existing
             const data = await apiRequest(`/devices/${device._id}`, {
                 method: 'PUT',
                 body: JSON.stringify(device)
             });
             return data;
         } else {
-            // Create new
             const data = await apiRequest('/devices', {
                 method: 'POST',
                 body: JSON.stringify(device)
@@ -183,7 +184,6 @@ async function saveDevice(device) {
 
 async function saveBill(bill) {
     try {
-        // Validate bill data before sending
         if (!bill) {
             throw new Error('Bill data is required');
         }
@@ -194,14 +194,11 @@ async function saveBill(bill) {
             throw new Error('Valid amount is required');
         }
         
-        console.log('Saving bill:', bill);
-        
         const data = await apiRequest('/gaming-bills', {
             method: 'POST',
             body: JSON.stringify(bill)
         });
         
-        console.log('Bill saved successfully:', data);
         return data;
     } catch (error) {
         console.error('Error saving bill:', error);
@@ -289,20 +286,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('username').innerHTML = `Welcome back, <span class="text-primary">${currentUser.name}</span>`;
     }
     
-    // Load all data from API
     await Promise.all([
         loadDevices(),
         loadBills(),
         loadShopExpenses()
     ]);
     
-    // Update timers
     updateAllTimers();
-    
-    // Initial display
     updateAllDisplays();
-    
-    // Set date for expense form
     document.getElementById('expenseDate').valueAsDate = now;
     
     console.log('GameHub Manager loaded successfully');
@@ -390,7 +381,7 @@ function updateCurrencyDisplay() {
 }
 
 function formatCurrency(amount) {
-    if (isNaN(amount) || amount === undefined) return '0.00';
+    if (isNaN(amount) || amount === undefined || amount === null) return '0.00';
     return new Intl.NumberFormat('en-IN', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -664,15 +655,24 @@ async function startDeviceSession(id) {
     }
 }
 
-// Store pending bill data for summary modal
-let pendingBillData = null;
-
 async function endDeviceSession(id) {
+    // Prevent multiple clicks
+    if (isBillProcessing) {
+        showNotification('Please wait, processing bill...', 'warning');
+        return;
+    }
+    
     const device = devices.find(d => d._id === id);
     if (!device || !device.isActive) {
         showNotification('Device is not active', 'error');
         return;
     }
+    
+    // Stop the timer immediately
+    stopTimer(id);
+    
+    // Immediately deactivate the device on UI
+    device.isActive = false;
     
     const startTime = new Date(device.sessionStart);
     const endTime = new Date();
@@ -683,7 +683,10 @@ async function endDeviceSession(id) {
     const minHours = Math.max(durationHours, 0.5);
     const amount = Math.round((minHours * device.ratePerHour) * 100) / 100;
     
-    // Store bill data for summary - Make a deep copy to prevent reference issues
+    // Store device ID for processing
+    currentDeviceId = id;
+    
+    // Store bill data for summary
     pendingBillData = {
         deviceId: device._id,
         deviceName: device.name,
@@ -693,18 +696,15 @@ async function endDeviceSession(id) {
         duration: durationMs,
         durationHours: minHours,
         amount: amount,
-        ratePerHour: device.ratePerHour,
-        device: device // Store reference to update later
+        ratePerHour: device.ratePerHour
     };
     
-    // Stop the timer
-    stopTimer(id);
-    
     // Show bill summary modal
-    showBillSummary(pendingBillData);
+    showBillSummary();
 }
 
-function showBillSummary(data) {
+function showBillSummary() {
+    const data = pendingBillData;
     if (!data) {
         console.error('No bill data available');
         showNotification('Error: No bill data available', 'error');
@@ -739,14 +739,18 @@ function showBillSummary(data) {
 
 function closeBillSummary() {
     document.getElementById('billSummaryModal').classList.add('hidden');
-    // Don't clear pendingBillData here - let the confirm functions handle it
+    // Don't clear pendingBillData here
 }
 
 async function confirmBillPaid() {
-    // Store data locally before clearing
+    // Prevent multiple clicks
+    if (isBillProcessing) return;
+    isBillProcessing = true;
+    
     const billData = pendingBillData;
     if (!billData) {
         showNotification('No bill data found', 'error');
+        isBillProcessing = false;
         return;
     }
     
@@ -766,9 +770,13 @@ async function confirmBillPaid() {
         const result = await saveBill(billObject);
         
         if (result.success) {
+            // Close modal first
+            document.getElementById('billSummaryModal').classList.add('hidden');
+            
+            // Add bill to list
             bills.push(result.bill);
             
-            // Update device
+            // Update device - DEACTIVATE IT and update earnings
             const device = devices.find(d => d._id === billData.deviceId);
             if (device) {
                 device.isActive = false;
@@ -778,9 +786,9 @@ async function confirmBillPaid() {
                 await saveDevice(device);
             }
             
-            // Close modal and clear data
-            document.getElementById('billSummaryModal').classList.add('hidden');
+            // Clear pending data
             pendingBillData = null;
+            currentDeviceId = null;
             
             showNotification(`Bill paid! ${CURRENCY_SYMBOLS[userCurrency]}${formatCurrency(billData.amount)}`, 'success');
             updateAllDisplays();
@@ -790,14 +798,20 @@ async function confirmBillPaid() {
     } catch (error) {
         console.error('Error in confirmBillPaid:', error);
         showNotification('Failed to save bill: ' + error.message, 'error');
+    } finally {
+        isBillProcessing = false;
     }
 }
 
 async function confirmBillPending() {
-    // Store data locally before clearing
+    // Prevent multiple clicks
+    if (isBillProcessing) return;
+    isBillProcessing = true;
+    
     const billData = pendingBillData;
     if (!billData) {
         showNotification('No bill data found', 'error');
+        isBillProcessing = false;
         return;
     }
     
@@ -817,9 +831,13 @@ async function confirmBillPending() {
         const result = await saveBill(billObject);
         
         if (result.success) {
+            // Close modal first
+            document.getElementById('billSummaryModal').classList.add('hidden');
+            
+            // Add bill to list
             bills.push(result.bill);
             
-            // Update device
+            // Update device - DEACTIVATE IT and update earnings
             const device = devices.find(d => d._id === billData.deviceId);
             if (device) {
                 device.isActive = false;
@@ -829,9 +847,9 @@ async function confirmBillPending() {
                 await saveDevice(device);
             }
             
-            // Close modal and clear data
-            document.getElementById('billSummaryModal').classList.add('hidden');
+            // Clear pending data
             pendingBillData = null;
+            currentDeviceId = null;
             
             showNotification(`Bill added to pending! ${CURRENCY_SYMBOLS[userCurrency]}${formatCurrency(billData.amount)}`, 'warning');
             updateAllDisplays();
@@ -841,6 +859,8 @@ async function confirmBillPending() {
     } catch (error) {
         console.error('Error in confirmBillPending:', error);
         showNotification('Failed to save bill: ' + error.message, 'error');
+    } finally {
+        isBillProcessing = false;
     }
 }
 
