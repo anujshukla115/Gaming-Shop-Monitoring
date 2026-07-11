@@ -1,0 +1,24 @@
+{
+  "name": "finflow-frontend",
+  "version": "1.0.0",
+  "description": "FinFlow Expense Tracker Frontend",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000",
+    "dev": "live-server --port=3000",
+    "build": "echo 'No build required for static site'",
+    "deploy": "echo 'Deploy to your preferred static hosting'"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": ["expense-tracker", "finance", "dashboard"],
+  "author": "FinFlow Team",
+  "license": "MIT"
+}
