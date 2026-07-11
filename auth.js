@@ -1,5 +1,5 @@
 // API Configuration
-const API_URL = 'https://finflow-expense-tracker-backend.vercel.app/api';
+const API_URL = 'https:///api';
 
 // For local development, use:
 // const API_URL = window.location.hostname === 'localhost' || 
