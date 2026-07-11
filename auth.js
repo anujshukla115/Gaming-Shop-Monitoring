@@ -1,5 +1,5 @@
 // API Configuration
-const API_URL = 'https://finflow-expense-tracker-backend.vercel.app/api';
+const API_URL = 'https://gaming-shop-monitoring-backend-three.vercel.app/api';
 
 // For local development, use:
 // const API_URL = window.location.hostname === 'localhost' || 
