@@ -3,45 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinFlow | Login</title>
+  <title>GameHub | Login</title>
   <link rel="stylesheet" href="auth.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="auth-container">
+    <!-- LEFT PANEL - Gaming Theme -->
     <div class="auth-left">
+      <!-- Floating Particles -->
+      <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+      </div>
+
       <div class="auth-content">
         <div class="logo">
-          <i class="fas fa-chart-line"></i>
-          <span>FinFlow</span>
+          <div class="logo-icon">
+            <i class="fas fa-gamepad"></i>
+          </div>
+          <span class="logo-text">GameHub</span>
         </div>
-        <h1>Manage Your Finances with Ease</h1>
-        <p>Track expenses, set budgets, and achieve your financial goals all in one place.</p>
+        
+        <h1>
+          Level Up Your<br />
+          <span class="highlight">Gaming Experience</span>
+        </h1>
+        
+        <p class="tagline">
+          Join the ultimate gaming marketplace. Discover, trade, and connect 
+          with gamers worldwide. Your next adventure starts here.
+        </p>
         
         <div class="features">
           <div class="feature">
-            <i class="fas fa-wallet"></i>
-            <span>Track Expenses</span>
+            <i class="fas fa-store"></i>
+            <span>Game Store</span>
           </div>
           <div class="feature">
-            <i class="fas fa-chart-pie"></i>
-            <span>Visual Analytics</span>
+            <i class="fas fa-trophy"></i>
+            <span>Tournaments</span>
           </div>
           <div class="feature">
             <i class="fas fa-users"></i>
-            <span>Split Bills</span>
+            <span>Community</span>
           </div>
           <div class="feature">
-            <i class="fas fa-bell"></i>
-            <span>Bill Reminders</span>
+            <i class="fas fa-gem"></i>
+            <span>Rewards</span>
           </div>
         </div>
       </div>
     </div>
     
+    <!-- RIGHT PANEL - Auth Form -->
     <div class="auth-right">
       <div class="auth-box">
+        <!-- Gaming Status -->
+        <div class="gaming-status">
+          <span class="dot"></span>
+          <span>10,247 gamers online</span>
+        </div>
+
         <!-- Message Alert -->
         <div id="messageAlert" class="message-alert hidden">
           <i class="fas fa-check-circle"></i>
@@ -50,18 +80,18 @@
         
         <!-- Login Form -->
         <div id="loginForm" class="form-container">
-          <h2>Welcome Back!</h2>
-          <p class="subtitle">Sign in to continue to FinFlow</p>
+          <h2>Welcome Back, Gamer!</h2>
+          <p class="subtitle">Sign in to continue your gaming journey</p>
           
           <form onsubmit="handleLogin(event)">
             <div class="form-group">
               <label for="loginEmail">
-                <i class="fas fa-envelope"></i> Email
+                <i class="fas fa-envelope"></i> Email Address
               </label>
               <input 
                 type="email" 
                 id="loginEmail" 
-                placeholder="Enter your email" 
+                placeholder="Enter your gaming email" 
                 required 
               />
             </div>
@@ -84,38 +114,42 @@
             </div>
             
             <button type="submit" class="btn-primary" id="loginBtn">
-              <i class="fas fa-sign-in-alt"></i> Sign In
+              <i class="fas fa-sign-in-alt btn-icon"></i> Sign In
             </button>
           </form>
           
+          <div class="gaming-divider">
+            <span>New to GameHub?</span>
+          </div>
+          
           <div class="form-footer">
             <p>Don't have an account? 
-              <a href="#" onclick="showSignup()">Sign Up</a>
+              <a href="#" onclick="showSignup()">Join the Game</a>
             </p>
           </div>
         </div>
         
         <!-- Signup Form -->
         <div id="signupForm" class="form-container hidden">
-          <h2>Create Account</h2>
-          <p class="subtitle">Join FinFlow and start managing your finances</p>
+          <h2>Create Your Gamer Profile</h2>
+          <p class="subtitle">Join the community and start your gaming adventure</p>
           
           <form onsubmit="handleSignup(event)">
             <div class="form-group">
               <label for="signupName">
-                <i class="fas fa-user"></i> Full Name
+                <i class="fas fa-user"></i> Gamer Name
               </label>
               <input 
                 type="text" 
                 id="signupName" 
-                placeholder="Enter your full name" 
+                placeholder="Enter your gamer name" 
                 required 
               />
             </div>
             
             <div class="form-group">
               <label for="signupEmail">
-                <i class="fas fa-envelope"></i> Email
+                <i class="fas fa-envelope"></i> Email Address
               </label>
               <input 
                 type="email" 
@@ -127,13 +161,13 @@
             
             <div class="form-group">
               <label for="signupPassword">
-                <i class="fas fa-lock"></i> Password
+                <i class="fas fa-lock"></i> Create Password
               </label>
               <div class="password-input">
                 <input 
                   type="password" 
                   id="signupPassword" 
-                  placeholder="Create a password (min 6 characters)" 
+                  placeholder="Create a strong password (min 6 chars)" 
                   required 
                   minlength="6"
                 />
@@ -162,9 +196,13 @@
             </div>
             
             <button type="submit" class="btn-primary" id="signupBtn">
-              <i class="fas fa-user-plus"></i> Create Account
+              <i class="fas fa-user-plus btn-icon"></i> Join GameHub
             </button>
           </form>
+          
+          <div class="gaming-divider">
+            <span>Already a member?</span>
+          </div>
           
           <div class="form-footer">
             <p>Already have an account? 
